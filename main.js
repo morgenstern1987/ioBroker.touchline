@@ -24,6 +24,7 @@ class TouchlineAdapter extends utils.Adapter {
 
     async onReady() {
         await this.setStateAsync('info.connection', false, true);
+        await this.setStateAsync('info.lastError', '', true);
 
         if (!this.config.localIp || !String(this.config.localIp).trim()) {
             this.log.error('Please configure a local IP / hostname of the Touchline controller.');
@@ -290,7 +291,14 @@ class TouchlineAdapter extends utils.Adapter {
             await this.flattenToStates(['api', snapshot.apiType, ...endpointKey], payload.data);
         }
 
-        await this.setStateAsync('info.connection', true, true);
+        if (snapshot.successfulEndpoints > 0) {
+            await this.setStateAsync('info.lastError', '', true);
+            await this.setStateAsync('info.connection', true, true);
+            return;
+        }
+
+        await this.setStateAsync('info.connection', false, true);
+        await this.setStateAsync('info.lastError', 'No compatible endpoint found (all configured/default endpoints failed)', true);
     }
 
     async onUnload(callback) {
@@ -306,6 +314,7 @@ class TouchlineAdapter extends utils.Adapter {
             }
 
             await this.setStateAsync('info.connection', false, true);
+        await this.setStateAsync('info.lastError', '', true);
             callback();
         } catch (error) {
             callback(error);
