@@ -83,27 +83,33 @@
 
 <script>
     // ioBroker Admin Standardfunktionen
-    function load(settings, onChange) {
-        if (!settings) return;
+function load(settings, onChange) {
+    if (!settings) return;
 
-        document.getElementById('host').value          = settings.host          || '';
-        document.getElementById('pollInterval').value  = settings.pollInterval  || 30;
-        document.getElementById('requestTimeout').value = settings.requestTimeout || 5000;
+    // Textfelder
+    document.getElementById('host').value = settings.host || '';
+    document.getElementById('pollInterval').value = settings.pollInterval || 30;
+    document.getElementById('requestTimeout').value = settings.requestTimeout || 5000;
 
-        // Select muss nach Materialize-Init gesetzt werden
-        setTimeout(() => {
-            const sel = document.getElementById('apiVersion');
-            sel.value = settings.apiVersion || 'auto';
-            M.FormSelect.init(sel);
-        }, 100);
+    // Select setzen
+    const select = document.getElementById('apiVersion');
+    select.value = settings.apiVersion || 'auto';
 
-        M.updateTextFields();
+    // Materialize initialisieren
+    M.FormSelect.init(select);
 
-        // Änderungserkennung
-        document.querySelectorAll('.value').forEach(el => {
-            el.addEventListener('change', onChange);
-        });
-    }
+    // Textfelder aktualisieren
+    M.updateTextFields();
+
+    // Änderungserkennung
+    document.querySelectorAll('.value').forEach(el => {
+        el.addEventListener('change', () => onChange());
+        el.addEventListener('keyup', () => onChange());
+    });
+
+    // wichtig: speichern erst deaktiviert
+    onChange(false);
+}
 
     function save(callback) {
         callback({
