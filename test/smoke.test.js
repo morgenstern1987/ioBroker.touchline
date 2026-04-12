@@ -36,3 +36,9 @@ test('auto mode chooses api generation with more successful endpoints', async ()
     assert.equal(snapshot.apiType, 'new');
     assert.ok(snapshot.successfulEndpoints > 0);
 });
+
+
+test('buildBaseUrl honors full URL input from host', () => {
+    const client = new TouchlineClient({ host: 'http://192.168.10.52:8899', port: 80, protocol: 'https' });
+    assert.equal(client.buildBaseUrl(), 'http://192.168.10.52:8899');
+});

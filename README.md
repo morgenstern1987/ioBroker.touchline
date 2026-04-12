@@ -21,6 +21,7 @@ Der Adapter pollt den Touchline-Controller, legt daraus möglichst viele Datenpu
 
 ## Konfiguration (Admin-UI)
 
+- `Local IP / Hostname of Touchline controller` (auch als URL möglich, z. B. `http://192.168.10.52:8899`)
 - `Local IP / Hostname of Touchline controller`
 - `Protocol` (`HTTP`, `HTTPS`)
 - `Touchline API port` (Standard: `80`, z. B. `8899`)
@@ -36,6 +37,7 @@ Der Adapter pollt den Touchline-Controller, legt daraus möglichst viele Datenpu
 
 - API-Daten unter `touchline.X.api.<apiType>...`
 - Endpoint-Status unter `touchline.X.endpoints.<endpoint>.ok` und `...error`
+- Adapter-Info unter `touchline.X.info.*` (inkl. `info.baseUrl` für die tatsächlich verwendete Ziel-URL)
 - Adapter-Info unter `touchline.X.info.*`
 
 ## Entwicklung

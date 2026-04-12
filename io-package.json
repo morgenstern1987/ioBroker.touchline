@@ -124,6 +124,19 @@
       "native": {}
     },
     {
+      "_id": "info.baseUrl",
+      "type": "state",
+      "common": {
+        "name": "Resolved base URL",
+        "type": "string",
+        "role": "text",
+        "read": true,
+        "write": false,
+        "def": ""
+      },
+      "native": {}
+    },
+    {
       "_id": "bridge",
       "type": "channel",
       "common": {

@@ -25,6 +25,7 @@ class TouchlineAdapter extends utils.Adapter {
     async onReady() {
         await this.setStateAsync('info.connection', false, true);
         await this.setStateAsync('info.lastError', '', true);
+        await this.setStateAsync('info.baseUrl', '', true);
 
         if (!this.config.localIp || !String(this.config.localIp).trim()) {
             this.log.error('Please configure a local IP / hostname of the Touchline controller.');
@@ -41,6 +42,8 @@ class TouchlineAdapter extends utils.Adapter {
             requestTimeout: this.config.requestTimeout || 5000,
         });
 
+        this.log.info(`Touchline target: ${this.client.buildBaseUrl()}`);
+        await this.setStateAsync('info.baseUrl', this.client.buildBaseUrl(), true);
         this.log.info(`Touchline target: ${this.config.protocol || 'http'}://${this.config.localIp.trim()}:${this.config.apiPort || 80}`);
 
         if (this.config.enableWebServer) {
@@ -321,6 +324,9 @@ class TouchlineAdapter extends utils.Adapter {
             }
 
             await this.setStateAsync('info.connection', false, true);
+            await this.setStateAsync('info.lastError', '', true);
+            await this.setStateAsync('info.baseUrl', '', true);
+        await this.setStateAsync('info.baseUrl', '', true);
         await this.setStateAsync('info.lastError', '', true);
             callback();
         } catch (error) {
