@@ -2,18 +2,16 @@
   "common": {
     "name": "touchline",
     "version": "0.1.0",
-    "title": "Roth Touchline Adapter",
-    "desc": {
-      "en": "Adapter for Roth Touchline heating controller",
-      "de": "Adapter für Roth Touchline Heizungssteuerung"
+    "title": "Touchline Legacy Adapter",
+    "titleLang": {
+      "en": "Touchline Legacy Adapter",
+      "de": "Touchline Legacy Adapter"
     },
-    "authors": [
-      "Henrik Morgenstern"
-    ],
-    "keywords": [
-      "touchline",
-      "heating"
-    ],
+    "desc": {
+      "en": "Adapter for Roth Touchline legacy heating controller",
+      "de": "Adapter für Roth Touchline (alte API)"
+    },
+    "authors": ["Henrik Morgenstern"],
     "license": "MIT",
     "platform": "Javascript/Node.js",
     "mode": "daemon",
@@ -44,8 +42,7 @@
         "type": "boolean",
         "role": "indicator.connected",
         "read": true,
-        "write": false,
-        "def": false
+        "write": false
       },
       "native": {}
     }
