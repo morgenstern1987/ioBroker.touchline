@@ -1,60 +1,54 @@
-# iobroker.touchline
+# ioBroker.touchline
 
-Release-fähiger ioBroker-Adapter für **Roth Touchline Legacy API** (alte API).
+[![NPM version](https://img.shields.io/npm/v/iobroker.touchline.svg)](https://www.npmjs.com/package/iobroker.touchline)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-## Fokus dieser Version
+Adapter für **Roth Touchline** und **Roth Touchline SL** Fußbodenheizungsregler.
+Unterstützt beide Firmware-Generationen über das lokale Netzwerk – kein Cloud-Zugriff nötig.
 
-Diese Version nutzt **ausschließlich die alte Touchline-API**. Alle Logiken für die neue API wurden entfernt, damit die Verbindung bei älteren Anlagen stabil bleibt.
+## Unterstützte Geräte
 
-## Features
-
-- Reine Legacy-API-Unterstützung (`old`)
-- Konfigurierbare lokale Touchline-Adresse (IP/Hostname oder vollständige URL)
-- Konfigurierbarer API-Port (`80` oder `8899` üblich) und Request-Timeout
-- Port-Fallback bei Verbindungsproblemen (`80`, `8899`)
-- Optionaler lokaler Bridge-Webserver
-- Rekursives Mapping vieler API-Werte in ioBroker-States
-- Endpoint-Status unter `touchline.X.endpoints.*`
-
-## Konfiguration
-
-- `Local IP / Hostname of Touchline controller`
-- `Protocol` (`HTTP` / `HTTPS`)
-- `Touchline API port`
-- `HTTP timeout (ms)`
-- `Polling interval (seconds)`
-- optional `Username` / `Password` oder `Bearer token`
-- `Additional legacy API paths` (Komma, Semikolon oder Zeilenumbruch)
-- `Enable local bridge webserver`
-- `Webserver port`
-
-> Wichtig: `Webserver port` (Bridge, Standard `8099`) ist **nicht** der Touchline-API-Port.
+| Gerät            | API         | Status |
+|------------------|-------------|--------|
+| Touchline (alt)  | Legacy CGI  | ✅     |
+| Touchline SL     | REST JSON   | ✅     |
 
 ## Datenpunkte
 
-- API-Daten unter `touchline.X.api.old...`
-- Endpoint-Status unter `touchline.X.endpoints.<endpoint>.ok` und `...error`
-- Adapter-Info unter `touchline.X.info.*` (`connection`, `lastError`, `apiType`, `baseUrl`)
+### `system.*`
+| Datenpunkt       | Beschreibung        |
+|------------------|---------------------|
+| firmware         | Firmware-Version    |
+| serialNumber     | Seriennummer        |
+| apiVersion       | Erkannte API        |
 
-## Bridge-Endpunkte
+### `zones.<id>.*`
+| Datenpunkt           | Beschreibung              | Schreibbar |
+|----------------------|---------------------------|------------|
+| name                 | Zonenname                 | –          |
+| currentTemperature   | Isttemperatur (°C)        | –          |
+| targetTemperature    | Solltemperatur (°C)       | ✅         |
+| floorTemperature     | Fußbodentemperatur (°C)   | –          |
+| humidity             | Luftfeuchtigkeit (%)      | –          |
+| co2                  | CO₂ (ppm, SL only)        | –          |
+| mode                 | Modus als Text            | –          |
+| modeRaw              | Modus (0–3)               | ✅         |
+| windowContact        | Fensterkontakt offen?     | –          |
+| valvePosition        | Ventilstellung (%)        | –          |
+| weekSchedule         | Wochenprogramm-ID         | ✅ (SL)    |
+| online               | Zone erreichbar           | –          |
 
-- `GET /health`
-- `GET /api/states`
-- `POST /api/refresh`
+### Modi
+| Wert | Legacy   | SL       |
+|------|----------|----------|
+| 0    | auto     | standby  |
+| 1    | day      | auto     |
+| 2    | night    | manual   |
+| 3    | holiday  | holiday  |
 
-## Entwicklung
+## Installation
 
 ```bash
-npm install
-npm run lint
-npm run check
-npm test
-```
-
-## CI
-
-GitHub Actions führt aus:
-
-- `npm install`
-- `npm run lint`
-- `npm run check`
+cd /opt/iobroker
+npm install iobroker.touchline
+iobroker add touchline
