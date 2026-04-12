@@ -44,7 +44,6 @@ class TouchlineAdapter extends utils.Adapter {
 
         this.log.info(`Touchline target: ${this.client.buildBaseUrl()}`);
         await this.setStateAsync('info.baseUrl', this.client.buildBaseUrl(), true);
-        this.log.info(`Touchline target: ${this.config.protocol || 'http'}://${this.config.localIp.trim()}:${this.config.apiPort || 80}`);
 
         if (this.config.enableWebServer) {
             this.startBridgeServer();
@@ -327,7 +326,6 @@ class TouchlineAdapter extends utils.Adapter {
             await this.setStateAsync('info.lastError', '', true);
             await this.setStateAsync('info.baseUrl', '', true);
         await this.setStateAsync('info.baseUrl', '', true);
-        await this.setStateAsync('info.lastError', '', true);
             callback();
         } catch (error) {
             callback(error);
