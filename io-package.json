@@ -1,0 +1,18 @@
+{
+  "common": {
+    "name": "touchline",
+    "version": "0.0.1",
+    "title": "Roth Touchline",
+    "desc": {
+      "en": "Adapter for Roth Touchline heating controller"
+    },
+    "mode": "daemon",
+    "platform": "Javascript/Node.js",
+    "icon": "touchline.png",
+    "enabled": true
+  },
+  "native": {
+    "ip": "192.168.10.52",
+    "interval": 60
+  }
+}
