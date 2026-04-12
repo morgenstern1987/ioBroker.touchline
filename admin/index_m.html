@@ -3,14 +3,16 @@
 <head>
     <meta charset="utf-8">
 
-    <link rel="stylesheet" href="../../css/adapter.css">
-    <link rel="stylesheet" href="../../lib/css/materialize.css">
+    <title>Touchline Adapter</title>
 
-    <script src="../../lib/js/jquery-3.2.1.min.js"></script>
+    <link rel="stylesheet" href="../../css/adapter.css"/>
+    <link rel="stylesheet" href="../../lib/css/materialize.css"/>
+
+    <script src="../../lib/js/jquery-3.6.0.min.js"></script>
     <script src="../../lib/js/materialize.js"></script>
 
+    <script src="../../js/translate.js"></script>
     <script src="../../js/adapter-settings.js"></script>
-    <script src="words.js"></script>
 </head>
 
 <body>
@@ -19,20 +21,20 @@
 
     <div class="row">
         <div class="col s12">
-            <h5>Touchline Adapter</h5>
+            <h5>Touchline Adapter Einstellungen</h5>
         </div>
     </div>
 
     <div class="row">
 
         <div class="input-field col s6">
-            <input id="host" type="text" class="value">
+            <input id="host" type="text" class="value"/>
             <label for="host">Controller IP</label>
         </div>
 
         <div class="input-field col s6">
-            <input id="pollInterval" type="number" class="value">
-            <label for="pollInterval">Polling Interval (Sek)</label>
+            <input id="pollInterval" type="number" class="value"/>
+            <label for="pollInterval">Polling Intervall (Sekunden)</label>
         </div>
 
     </div>
@@ -48,7 +50,8 @@ function load(settings, onChange) {
     $('#host').val(settings.host || '');
     $('#pollInterval').val(settings.pollInterval || 30);
 
-    // wichtig: Änderungen erkennen
+    M.updateTextFields();
+
     $('.value').on('change keyup', function () {
         onChange();
     });
@@ -58,10 +61,10 @@ function load(settings, onChange) {
 
 function save(callback) {
 
-    const obj = {};
-
-    obj.host = $('#host').val();
-    obj.pollInterval = parseInt($('#pollInterval').val()) || 30;
+    const obj = {
+        host: $('#host').val(),
+        pollInterval: parseInt($('#pollInterval').val()) || 30
+    };
 
     callback(obj);
 }
