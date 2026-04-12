@@ -13,7 +13,7 @@ Der Adapter pollt den Touchline-Controller, legt daraus möglichst viele Datenpu
 - Polling in einstellbarem Intervall
 - Rekursives Mapping in möglichst viele ioBroker-Datenpunkte
 - Stabilere IDs bei Arrays (z. B. nach `id`, `uuid`, `name`)
-- Zusätzliche API-Pfade frei konfigurierbar (ein Pfad pro Zeile)
+- Zusätzliche API-Pfade frei konfigurierbar (Komma, Semikolon oder Zeilenumbruch)
 - Optionaler Bridge-Webserver
   - `GET /health`
   - `GET /api/states`
