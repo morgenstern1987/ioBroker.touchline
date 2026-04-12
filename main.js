@@ -23,7 +23,19 @@ class TouchlineAdapter extends utils.Adapter {
     // Lifecycle
     // ─────────────────────────────────────────────
 
-    async onReady() {
+    async onReady() 
+    await this.setObjectNotExistsAsync('info.connection', {
+    type: 'state',
+    common: {
+        name: 'Connected',
+        type: 'boolean',
+        role: 'indicator.connected',
+        read: true,
+        write: false
+    },
+    native: {}
+});
+    {
         this.setState('info.connection', false, true);
 
         const host = (this.config.host || '').trim();
