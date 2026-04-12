@@ -109,6 +109,19 @@
       "native": {}
     },
     {
+      "_id": "info.lastError",
+      "type": "state",
+      "common": {
+        "name": "Last adapter error",
+        "type": "string",
+        "role": "text",
+        "read": true,
+        "write": false,
+        "def": ""
+      },
+      "native": {}
+    },
+    {
       "_id": "bridge",
       "type": "channel",
       "common": {

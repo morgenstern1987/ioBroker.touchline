@@ -60,3 +60,13 @@ npm run zip
 ```
 
 Danach liegt `iobroker.touchline.zip` im Projektverzeichnis.
+
+## Troubleshooting
+
+Wenn `info.connection = false` und keine API-Daten unter `api.*` erscheinen:
+
+- prüfe `info.lastError`
+- setze ggf. `Touchline API generation` explizit auf `New` oder `Legacy`
+- ergänze unter `Additional API paths` bekannte Endpunkte deiner Firmware
+
+Der Adapter markiert nur dann `info.connection = true`, wenn mindestens ein Endpoint erfolgreich gelesen wurde.
