@@ -1,0 +1,20 @@
+{
+  "name": "iobroker.touchline",
+  "version": "0.0.1",
+  "description": "Roth Touchline adapter for ioBroker",
+  "author": "Henrik Morgenstern",
+  "license": "MIT",
+  "main": "main.js",
+  "keywords": [
+    "iobroker",
+    "touchline",
+    "heating"
+  ],
+  "dependencies": {
+    "@iobroker/adapter-core": "^3.2.3",
+    "axios": "^1.6.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
