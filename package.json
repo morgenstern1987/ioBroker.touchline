@@ -1,6 +1,6 @@
 {
   "name": "iobroker.touchline",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "ioBroker adapter for Roth Touchline legacy heating controller",
   "author": "Henrik Morgenstern",
   "license": "MIT",
