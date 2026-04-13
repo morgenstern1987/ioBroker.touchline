@@ -64,13 +64,13 @@ class TouchlineAdapter extends utils.Adapter {
                 native: {}
             });
 
-            await this.createState(`${base}.currentTemperature`, "Ist Temperatur", false);
-            await this.createState(`${base}.targetTemperature`, "Soll Temperatur", true);
-            await this.createState(`${base}.mode`, "Betriebsmodus", false);
-            await this.createState(`${base}.weekProgram`, "Wochenprogramm", false);
-            await this.createState(`${base}.minTemp`, "Min Temperatur", false);
-            await this.createState(`${base}.maxTemp`, "Max Temperatur", false);
-            await this.createState(`${base}.step`, "Temp Schritt", false);
+            await this.createNumberState(`${base}.currentTemperature`, "Ist Temperatur", false);
+            await this.createNumberState(`${base}.targetTemperature`, "Soll Temperatur", true);
+            await this.createNumberState(`${base}.mode`, "Betriebsmodus", false);
+            await this.createNumberState(`${base}.weekProgram`, "Wochenprogramm", false);
+            await this.createNumberState(`${base}.minTemp`, "Min Temperatur", false);
+            await this.createNumberState(`${base}.maxTemp`, "Max Temperatur", false);
+            await this.createNumberState(`${base}.step`, "Temp Schritt", false);
 
             await this.setObjectNotExistsAsync(`${base}.available`, {
                 type: "state",
@@ -92,7 +92,7 @@ class TouchlineAdapter extends utils.Adapter {
         this.pollTimer = setInterval(() => this.poll(), (this.config.pollInterval || 30) * 1000);
     }
 
-    async createState(id, name, write) {
+    async createNumberState(id, name, write) {
 
         await this.setObjectNotExistsAsync(id, {
             type: "state",
@@ -113,9 +113,23 @@ class TouchlineAdapter extends utils.Adapter {
 
             const zones = await this.api.getZoneCount();
 
+            const variables = [];
+
             for (let i = 0; i < zones; i++) {
 
-                const data = await this.api.getZoneDetails(i);
+                variables.push(`G${i}.RaumTemp`);
+                variables.push(`G${i}.SollTemp`);
+                variables.push(`G${i}.OPMode`);
+                variables.push(`G${i}.WeekProg`);
+                variables.push(`G${i}.SollTempMinVal`);
+                variables.push(`G${i}.SollTempMaxVal`);
+                variables.push(`G${i}.SollTempStepVal`);
+                variables.push(`G${i}.available`);
+            }
+
+            const data = await this.api.readMultiple(variables);
+
+            for (let i = 0; i < zones; i++) {
 
                 const current = parseInt(data[`G${i}.RaumTemp`] || 0) / 100;
                 const target = parseInt(data[`G${i}.SollTemp`] || 0) / 100;
@@ -178,7 +192,7 @@ class TouchlineAdapter extends utils.Adapter {
 
         if (parts[2] !== "zones") return;
 
-        const zone = parseInt(parts[3].replace("zone",""));
+        const zone = parseInt(parts[3].replace("zone", ""));
 
         if (parts[4] === "targetTemperature") {
 
@@ -204,10 +218,7 @@ class TouchlineAdapter extends utils.Adapter {
 }
 
 if (require.main !== module) {
-
     module.exports = options => new TouchlineAdapter(options);
-
 } else {
-
     new TouchlineAdapter();
 }
