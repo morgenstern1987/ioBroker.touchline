@@ -7,59 +7,92 @@ class TouchlineAdapter extends utils.Adapter {
 
     constructor(options = {}) {
 
-        super({ ...options, name: 'touchline' });
+        super({
+            ...options,
+            name: 'touchline'
+        });
 
         this.api = null;
+        this.pollTimer = null;
 
         this.on('ready', this.onReady.bind(this));
         this.on('stateChange', this.onStateChange.bind(this));
+        this.on('unload', this.onUnload.bind(this));
     }
 
     async onReady() {
 
-        await this.setStateAsync('info.connection', false, true);
+        await this.setObjectNotExistsAsync('info.connection', {
+            type: 'state',
+            common: {
+                name: 'Connection',
+                type: 'boolean',
+                role: 'indicator.connected',
+                read: true,
+                write: false
+            },
+            native: {}
+        });
 
         const host = this.config.host;
 
         if (!host) {
 
-            this.log.error('Keine IP gesetzt');
+            this.log.error("Keine IP gesetzt");
 
             return;
         }
 
         this.api = new LegacyAPI(host);
 
-        const zones = await this.api.getZoneCount();
+        let zoneCount = 0;
 
-        this.log.info(`Gefundene Räume: ${zones}`);
+        try {
 
-        for (let i = 0; i < zones; i++) {
+            zoneCount = await this.api.getZoneCount();
 
-            const id = `zones.zone${i}`;
+        } catch (e) {
 
-            await this.setObjectNotExistsAsync(id, {
-                type: 'channel',
+            this.log.error("Touchline nicht erreichbar");
+
+            return;
+        }
+
+        this.log.info(`Gefundene Räume: ${zoneCount}`);
+
+        for (let i = 0; i < zoneCount; i++) {
+
+            const base = `zones.zone${i}`;
+
+            await this.setObjectNotExistsAsync(base, {
+                type: "channel",
                 common: { name: `Zone ${i}` },
                 native: {}
             });
 
-            await this.createState(`${id}.currentTemp`, 'Ist Temperatur', false);
-            await this.createState(`${id}.targetTemp`, 'Soll Temperatur', true);
+            await this.createState(`${base}.currentTemperature`, "Ist Temperatur", false);
+            await this.createState(`${base}.targetTemperature`, "Soll Temperatur", true);
         }
+
+        this.subscribeStates("zones.*.targetTemperature");
 
         this.poll();
 
-        setInterval(() => this.poll(), (this.config.pollInterval || 30) * 1000);
+        this.pollTimer = setInterval(() => {
+
+            this.poll();
+
+        }, (this.config.pollInterval || 30) * 1000);
     }
 
     async createState(id, name, write) {
 
         await this.setObjectNotExistsAsync(id, {
-            type: 'state',
+            type: "state",
             common: {
                 name,
-                type: 'number',
+                type: "number",
+                role: "value.temperature",
                 read: true,
                 write
             },
@@ -71,29 +104,26 @@ class TouchlineAdapter extends utils.Adapter {
 
         try {
 
-            const count = await this.api.getZoneCount();
+            const zoneCount = await this.api.getZoneCount();
 
-            for (let i = 0; i < count; i++) {
+            const data = await this.api.getZones(zoneCount);
 
-                const regs = await this.api.getRegisters([
-                    10000 + i * 6,
-                    10000 + i * 6 + 1
-                ]);
+            for (let i = 0; i < zoneCount; i++) {
 
-                const current = regs[10000 + i * 6 + 1] / 10;
-                const target = regs[10000 + i * 6] / 10;
+                const current = data[10000 + i * 6 + 1] / 10;
+                const target = data[10000 + i * 6] / 10;
 
-                await this.setStateAsync(`zones.zone${i}.currentTemp`, current, true);
-                await this.setStateAsync(`zones.zone${i}.targetTemp`, target, true);
+                await this.setStateAsync(`zones.zone${i}.currentTemperature`, current, true);
+                await this.setStateAsync(`zones.zone${i}.targetTemperature`, target, true);
             }
 
-            await this.setStateAsync('info.connection', true, true);
+            await this.setStateAsync("info.connection", true, true);
 
         } catch (e) {
 
-            this.log.error(e);
+            this.log.error("Polling Fehler: " + e.message);
 
-            await this.setStateAsync('info.connection', false, true);
+            await this.setStateAsync("info.connection", false, true);
         }
     }
 
@@ -103,18 +133,31 @@ class TouchlineAdapter extends utils.Adapter {
 
         const parts = id.split('.');
 
-        if (parts[2] !== 'zones') return;
+        if (parts[2] !== "zones") return;
 
-        const zone = parseInt(parts[3].replace('zone',''));
+        const zone = parseInt(parts[3].replace("zone",""));
 
-        if (parts[4] === 'targetTemp') {
+        if (parts[4] === "targetTemperature") {
 
-            const reg = 10000 + zone * 6;
+            try {
 
-            const value = Math.round(state.val * 10);
+                await this.api.setTargetTemperature(zone, state.val);
 
-            await this.api.getRegisters([`${reg}=${value}`]);
+            } catch (e) {
+
+                this.log.error("Solltemperatur setzen fehlgeschlagen");
+            }
         }
+    }
+
+    onUnload(callback) {
+
+        if (this.pollTimer) {
+
+            clearInterval(this.pollTimer);
+        }
+
+        callback();
     }
 }
 
