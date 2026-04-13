@@ -19,16 +19,14 @@
     "mode": "daemon",
     "type": "climate-control",
     "enabled": true,
-    "materialize": true,
 
-    "admin": {
+    "adminUI": {
       "config": "materialize"
     },
 
     "connectionType": "local",
     "dataSource": "poll",
-    "loglevel": "info",
-    "compact": true
+    "loglevel": "info"
   },
 
   "native": {
@@ -39,14 +37,6 @@
   "objects": [],
 
   "instanceObjects": [
-    {
-      "_id": "info",
-      "type": "channel",
-      "common": {
-        "name": "Information"
-      },
-      "native": {}
-    },
     {
       "_id": "info.connection",
       "type": "state",
