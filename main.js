@@ -17,6 +17,7 @@ class TouchlineAdapter extends utils.Adapter {
 
         this.on('ready', this.onReady.bind(this));
         this.on('stateChange', this.onStateChange.bind(this));
+        this.on('unload', this.onUnload.bind(this));
     }
 
     async onReady() {
@@ -73,13 +74,19 @@ class TouchlineAdapter extends utils.Adapter {
 
             await this.createState(`${base}.currentTemperature`, "Ist Temperatur", false);
             await this.createState(`${base}.targetTemperature`, "Soll Temperatur", true);
+            await this.createState(`${base}.mode`, "Betriebsmodus", false);
+            await this.createState(`${base}.weekProgram`, "Wochenprogramm", false);
+            await this.createState(`${base}.minTemp`, "Min Temperatur", false);
+            await this.createState(`${base}.maxTemp`, "Max Temperatur", false);
+            await this.createState(`${base}.step`, "Temp Schritt", false);
+            await this.createState(`${base}.available`, "Verfügbar", false);
         }
 
         this.subscribeStates("zones.*.targetTemperature");
 
         this.poll();
 
-        this.pollTimer = setInterval(() => this.poll(), 30000);
+        this.pollTimer = setInterval(() => this.poll(), (this.config.pollInterval || 30) * 1000);
     }
 
     async createState(id, name, write) {
@@ -105,10 +112,31 @@ class TouchlineAdapter extends utils.Adapter {
 
             for (let i = 0; i < zones; i++) {
 
-                const temps = await this.api.getZoneTemperature(i);
+                const data = await this.api.getZoneDetails(i);
 
-                await this.setStateAsync(`zones.zone${i}.currentTemperature`, temps.current, true);
-                await this.setStateAsync(`zones.zone${i}.targetTemperature`, temps.target, true);
+                const current = parseInt(data[`G${i}.RaumTemp`] || 0) / 100;
+                const target = parseInt(data[`G${i}.SollTemp`] || 0) / 100;
+
+                await this.setStateAsync(`zones.zone${i}.currentTemperature`, current, true);
+                await this.setStateAsync(`zones.zone${i}.targetTemperature`, target, true);
+
+                await this.setStateAsync(`zones.zone${i}.mode`,
+                    parseInt(data[`G${i}.OPMode`] || 0), true);
+
+                await this.setStateAsync(`zones.zone${i}.weekProgram`,
+                    parseInt(data[`G${i}.WeekProg`] || 0), true);
+
+                await this.setStateAsync(`zones.zone${i}.minTemp`,
+                    parseInt(data[`G${i}.SollTempMinVal`] || 0) / 100, true);
+
+                await this.setStateAsync(`zones.zone${i}.maxTemp`,
+                    parseInt(data[`G${i}.SollTempMaxVal`] || 0) / 100, true);
+
+                await this.setStateAsync(`zones.zone${i}.step`,
+                    parseInt(data[`G${i}.SollTempStepVal`] || 0) / 100, true);
+
+                await this.setStateAsync(`zones.zone${i}.available`,
+                    data[`G${i}.available`] === "online", true);
             }
 
             await this.setStateAsync("info.connection", true, true);
@@ -133,8 +161,22 @@ class TouchlineAdapter extends utils.Adapter {
 
         if (parts[4] === "targetTemperature") {
 
-            await this.api.setTargetTemperature(zone, state.val);
+            try {
+
+                await this.api.setTargetTemperature(zone, state.val);
+
+            } catch (e) {
+
+                this.log.error("Solltemperatur setzen fehlgeschlagen");
+            }
         }
+    }
+
+    onUnload(callback) {
+
+        if (this.pollTimer) clearInterval(this.pollTimer);
+
+        callback();
     }
 }
 
